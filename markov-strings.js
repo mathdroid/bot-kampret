@@ -54,7 +54,6 @@ class Markov {
 
     const options = this.options;
     strings.forEach((item, index) => {
-      console.log(index);
       const line = item.string;
       const words = line.split(" ");
       const stateSize = options.stateSize; // Default value of 2 is set in the constructor
