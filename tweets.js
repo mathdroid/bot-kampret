@@ -1,4 +1,3 @@
-
 const TYPES = Object.freeze({
   tweet: "tweet",
   retweet: "retweet",
@@ -24,48 +23,45 @@ const getSource = tweet => tweet.source.split(">")[1].split("<")[0];
 
 const isAutomatedSource = tweet => AUTOMATED_SOURCES.includes(getSource(tweet));
 
+const getScreenNameFromPermalink = (permalink = "") =>
+  permalink.split(".com/")[1].split("/status")[0];
+
 const getSummary = tweet => {
   let type = TYPES.tweet;
   let coActor = undefined;
   const actor = tweet.user.screen_name;
-  const permalinks = [createPermalink(actor, tweet.id_str)];
   if (isRetweet(tweet)) {
     type = TYPES.retweet;
     coActor = tweet.retweeted_status.user.screen_name;
-    permalinks.push(
-      createPermalink(
-        tweet.retweeted_status.user.screen_name,
-        tweet.retweeted_status.id_str
-      )
-    );
   } else if (isQuoteTweet(tweet)) {
     type = TYPES.quote;
-    coActor = tweet.quoted_status.user.screen_name;
-    permalinks.push(tweet.quoted_status_permalink.expanded);
+    coActor =
+      (tweet.quoted_status && tweet.quoted_status.user.screen_name) ||
+      (tweet.quoted_status_permalink &&
+        tweet.quoted_status_permalink.expanded.includes(".com/") &&
+        getScreenNameFromPermalink(tweet.quoted_status_permalink.expanded)) ||
+      null;
   } else if (isReplyTweet(tweet)) {
     type = TYPES.reply;
     coActor = tweet.in_reply_to_screen_name;
-    permalinks.push(
-      createPermalink(
-        tweet.in_reply_to_screen_name,
-        tweet.in_reply_to_status_id_str
-      )
-    );
   }
   return {
     type,
     actor,
-    coActor,
-    permalinks
+    coActor
   };
 };
 
 const getTweetText = tweet => {
-  return !!tweet.truncated
-    ? tweet.extended_tweet.full_text
-    : tweet.text || tweet.full_text;
+  return isRetweet(tweet)
+    ? getTweetText(tweet.retweeted_status)
+    : tweet.full_text;
 };
 
+const getCreatedDate = tweet => {
+  const [, monthShort, date, time, zone, year] = tweet.created_at.split(" ");
+  return new Date(`${monthShort} ${date}, ${year} ${time}${zone}`);
+};
 
 module.exports = {
   TYPES,
@@ -77,5 +73,6 @@ module.exports = {
   getSource,
   getSummary,
   isAutomatedSource,
-  getTweetText
+  getTweetText,
+  getCreatedDate
 };

@@ -7,14 +7,15 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "twit": "^2.1.0",
-    "express": "^4.14.0",
-    "passport-twitter": "^1.0.4",
-    "passport": "^0.4.0",
-    "morgan": "^1.9.1",
     "cookie-parser": "^1.4.4",
+    "express": "^4.14.0",
     "express-session": "^1.16.1",
-    "markov-strings": "^2.0.2"
+    "markov-strings": "^2.0.2",
+    "morgan": "^1.9.1",
+    "passport": "^0.4.0",
+    "passport-twitter": "^1.0.4",
+    "sqlite3": "^4.0.8",
+    "twit": "^2.1.0"
   },
   "engines": {
     "node": "8.x"
@@ -30,5 +31,9 @@
     "twitter",
     "twitterbot",
     "bot"
-  ]
+  ],
+  "devDependencies": {
+    "dotenv": "^8.0.0",
+    "sync-glitch-cli": "^2.0.1"
+  }
 }
